@@ -162,29 +162,6 @@ public class EggCooking : MonoBehaviour
         isResultFinished = true;
         audioSource.Stop();
 
-        Debug.Log("結果発表！");
-
-        if (totalCookProgress > 0.5f && totalCookProgress < 0.7f)
-        {
-            Debug.Log("完璧な半熟！");
-            audioSource.PlayOneShot(fanfareSound);
-        }
-        else if (totalCookProgress > 0.7f && totalCookProgress <= 1.1f)
-        {
-            Debug.Log("しっかし焼き！");
-            audioSource.PlayOneShot(normalSound);
-        }
-        else if (totalCookProgress > 1.1f)
-        {
-            Debug.Log("焦げ焦げ！");
-            audioSource.PlayOneShot(badSound);
-        }
-        else
-        {
-            Debug.Log("生焼け！");
-            audioSource.PlayOneShot(badSound);
-        }
-
         StartCoroutine(ForkEndingSequence());
     }
 
@@ -231,22 +208,29 @@ public class EggCooking : MonoBehaviour
 
     void EvaluateAndSetResultImage()
     {
-        // 判定に応じた画像をセット
-        if (totalCookProgress >= 0.5f && totalCookProgress <= 0.7f)
+        // 片面ずつの状態を定義
+        bool isBackOk = (backCookProgress >= 0.7f && backCookProgress <= 1.0f);
+        bool isFrontOk = (frontCookProgress >= 0.7f && frontCookProgress <= 1.0f);
+
+        // 両面OKならパーフェクト
+        if (isBackOk && isFrontOk)
         {
-            resultImage.sprite = spritePerfect; // 完璧画像をセット
+            resultImage.sprite = spritePerfect;
         }
-        else if (totalCookProgress > 0.7f && totalCookProgress <= 1.1f)
+        // どちらかが焦げすぎ（1.1以上）
+        else if (backCookProgress > 1.1f || frontCookProgress > 1.1f)
         {
-            resultImage.sprite = spriteGood;    // 普通画像をセット
+            resultImage.sprite = spriteBad; // 焦げ画像
         }
-        else if (totalCookProgress > 1.1f)
+        // どちらかが生（0.4未満）
+        else if (backCookProgress < 0.4f || frontCookProgress < 0.4f)
         {
-            resultImage.sprite = spriteBad;     // 焦げ画像をセット
+            resultImage.sprite = spriteRaw; // 生画像
         }
+        // 焦げてないし生でもないけど、両面完璧ではない場合
         else
         {
-            resultImage.sprite = spriteRaw;     // 生画像をセット
+            resultImage.sprite = spriteGood; // 普通画像
         }
 
         resultImage.SetNativeSize();
