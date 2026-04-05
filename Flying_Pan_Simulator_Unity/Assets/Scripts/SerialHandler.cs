@@ -77,12 +77,12 @@ public class SerialHandler : MonoBehaviour
             try
             {
                 message_ = serialPort_.ReadLine();
-                //Debug.Log("★届いた生データ: " + message_); // これを追加！
+                //Debug.Log("★届いた生データ: " + message_);
                 isNewMessageReceived_ = true;
             }
             catch (System.Exception e)
             {
-                // ここでエラーが出たら教えてください
+                Debug.LogWarning(e.Message);
             }
         }
     }

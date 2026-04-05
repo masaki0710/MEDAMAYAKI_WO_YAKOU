@@ -1,6 +1,11 @@
+#include <Servo.h>
+
 const int X_PIN = 26;
 const int Y_PIN = 27;
 const int Z_PIN = 28;
+const int SERVO_PIN = 15;
+
+Servo myServo;
 
 struct Coordinate {
   long cx, cy, cz;
@@ -17,6 +22,10 @@ const int N = 100;
 void setup() {
   Serial.begin(115200);
   analogReadResolution(12);
+
+  myServo.attach(SERVO_PIN);
+  myServo.attach(SERVO_PIN, 500, 2400);
+  myServo.write(0);
 }
 
 void loop() {
@@ -25,6 +34,18 @@ void loop() {
 
   String message = String(a.ax) + "," + String(a.ay) + "," + String(a.az) + "," + String(a.power);
   Serial.println(message);
+
+  // 受信
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    int progress = input.toInt();
+
+    int angle = map(progress, 0, 100, 0, 180);
+
+    if (progress >= 0 && progress <= 100){
+      myServo.write(angle);
+    }
+  }
 
   delay(20);
 }
